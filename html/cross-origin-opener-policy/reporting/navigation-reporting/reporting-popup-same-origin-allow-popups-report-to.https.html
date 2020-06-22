@@ -3,13 +3,14 @@
 <script src=/resources/testharness.js></script>
 <script src=/resources/testharnessreport.js></script>
 <script src="/common/get-host-info.sub.js"></script>
-<script src="resources/common.js"></script>
-<script src="resources/reporting-common.js"></script>
+<script src="/common/utils.js"></script>
+<script src="../../resources/common.js"></script>
+<script src="../resources/reporting-common.js"></script>
 
 <script>
 
 let tests = [
-  // popup origin, popup COOP, popup COEP, expected opener, expected reports
+  // popup origin, popup COOP, popup COEP, popup COOP report only, popup COEP report only, expected reports
 
   // Open a same-origin popup with a same-origin COOP and no COEP. Produces two
   // reports (one from and one to). Both pages being same origin, the
@@ -18,7 +19,8 @@ let tests = [
     SAME_ORIGIN,
     `same-origin; report-to="${popupReportEndpoint.name}"`,
     "",
-    false,
+    "",
+    "",
     [
       {
         "endpoint": reportEndpoint,
@@ -27,7 +29,7 @@ let tests = [
             "disposition": "enforce",
             "document-uri": `${location.href}`,
             "effective-policy": "same-origin-allow-popups",
-            "navigation-uri": /coop-coep.py?.*channel=CHANNEL_NAME$/, // next document URL
+            "navigation-uri": /coop-coep.py?.*channel=EXECUTOR_UUID$/, // next document URL
             "violation-type": "navigation-from-document"
           },
           "url": `${location.href}`,
@@ -39,12 +41,12 @@ let tests = [
         "report": {
           "body": {
             "disposition": "enforce",
-            "document-uri": /coop-coep.py?.*channel=CHANNEL_NAME$/,
+            "document-uri": /coop-coep.py?.*channel=EXECUTOR_UUID$/,
             "effective-policy": "same-origin",
             "navigation-uri": `${location.href}`, // previous documnent url
             "violation-type": "navigation-to-document"
           },
-          "url": /coop-coep.py?.*channel=CHANNEL_NAME$/,
+          "url": /coop-coep.py?.*channel=EXECUTOR_UUID$/,
           "type": "coop"
         }
       }
@@ -58,7 +60,8 @@ let tests = [
     CROSS_ORIGIN,
     `same-origin-allow-popups; report-to="${popupReportEndpoint.name}"`,
     "require-corp",
-    false,
+    "",
+    "",
     [
       {
         "endpoint": reportEndpoint,
@@ -67,7 +70,7 @@ let tests = [
             "disposition": "enforce",
             "document-uri": `${location.href}`,
             "effective-policy": "same-origin-allow-popups",
-            "navigation-uri": /coop-coep.py?.*channel=CHANNEL_NAME$/, // initial navigation URL
+            "navigation-uri": /coop-coep.py?.*channel=EXECUTOR_UUID$/, // initial navigation URL
             "violation-type": "navigation-from-document"
           },
           "url": `${location.href}`,
@@ -79,12 +82,12 @@ let tests = [
         "report": {
           "body": {
             "disposition": "enforce",
-            "document-uri": /coop-coep.py?.*channel=CHANNEL_NAME$/,
+            "document-uri": /coop-coep.py?.*channel=EXECUTOR_UUID$/,
             "effective-policy": "same-origin-allow-popups",
             "navigation-uri": `${location.origin}/`, // referrer (origin, as dictated by the referrer policy)
             "violation-type": "navigation-to-document"
           },
-          "url": /coop-coep.py?.*channel=CHANNEL_NAME$/,
+          "url": /coop-coep.py?.*channel=EXECUTOR_UUID$/,
           "type": "coop"
         }
       }
@@ -98,7 +101,8 @@ let tests = [
     CROSS_ORIGIN,
     `same-origin`,
     "require-corp",
-    false,
+    "",
+    "",
     [
       {
         "endpoint": reportEndpoint,
@@ -107,7 +111,7 @@ let tests = [
             "disposition": "enforce",
             "document-uri": `${location.href}`,
             "effective-policy": "same-origin-allow-popups",
-            "navigation-uri": /coop-coep.py?.*channel=CHANNEL_NAME$/, // initial navigation URL
+            "navigation-uri": /coop-coep.py?.*channel=EXECUTOR_UUID$/, // initial navigation URL
             "violation-type": "navigation-from-document"
           },
           "url": `${location.href}`,
@@ -118,6 +122,6 @@ let tests = [
   ],
 ];
 
-runCoopReportingTest(document.title, tests);
+runNavigationReportingTests(document.title, tests);
 
 </script>

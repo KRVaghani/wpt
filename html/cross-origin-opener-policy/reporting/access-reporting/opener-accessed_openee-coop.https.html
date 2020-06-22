@@ -1,5 +1,5 @@
 <title>
-  COOP reports are sent when the openee used COOP-RO+COEP and then tries to
+  COOP reports are sent when the openee used COOP+COEP and then tries to
   access its opener.
 </title>
 <meta name=timeout content=long>
@@ -7,10 +7,10 @@
 <script src=/resources/testharnessreport.js></script>
 <script src=/common/get-host-info.sub.js></script>
 <script src="/common/utils.js"></script>
-<script src="./resources/dispatcher.js"></script>
+<script src="../resources/dispatcher.js"></script>
 <script>
 
-const directory = "/html/cross-origin-opener-policy/access-reporting";
+const directory = "/html/cross-origin-opener-policy/reporting";
 const executor_path = directory + "/resources/executor.html?pipe=";
 const cross_origin = get_host_info().HTTPS_REMOTE_ORIGIN;
 const coep_header = '|header(Cross-Origin-Embedder-Policy,require-corp)';
@@ -46,10 +46,10 @@ operation.forEach(([property, op]) => {
 
     const reportTo = reportToHeaders(report_token);
     const openee_url = cross_origin + executor_path +
-      reportTo.header + reportTo.coopReportOnlySameOriginHeader + coep_header +
+      reportTo.header + reportTo.coopSameOriginHeader + coep_header +
       `&uuid=${executor_token}`;
     const openee = window.open(openee_url);
-    t.add_cleanup(() => send(executor_token, "window.close()"))
+    t.add_cleanup(() => send(executor_token, "window.close()"));
 
     // 1. Skip the first report about the opener breakage.
     let report_1 = await receive(report_token);
@@ -59,9 +59,9 @@ operation.forEach(([property, op]) => {
     assert_equals(report_1.length, 1);
     assert_equals(report_1[0].type, "coop");
     assert_equals(report_1[0].body["violation-type"], "navigation-to-document");
-    assert_equals(report_1[0].body["disposition"], "reporting");
+    assert_equals(report_1[0].body["disposition"], "enforce");
 
-    // 3. Try to access the opener. A report is sent, because of COOP-RO+COEP.
+    // 3. Try to access the opener. A report is sent, because of COOP+COEP.
     send(executor_token, `
       try {${op}} catch(e) {}
       send("${callback_token}", "Done");
@@ -71,20 +71,20 @@ operation.forEach(([property, op]) => {
 
     // 4. A COOP access reports must be sent as a result of (3).
     let report_2 = await receive(report_token);
-    assert_not_equals(report_2, "timeout", "Receive access report");
+    assert_not_equals(report_2, "timeout", "Received access report");
     report_2 = JSON.parse(report_2);
 
     assert_equals(report_2.length, 1);
     assert_equals(report_2[0].type, "coop");
     assert_equals(report_2[0].url, openee_url.replace(/"/g, '%22'));
     assert_equals(report_2[0].body["violation-type"], "access-from-coop-page");
-    assert_equals(report_2[0].body["disposition"], "reporting");
+    assert_equals(report_2[0].body["disposition"], "enforce");
     assert_equals(report_2[0].body["effective-policy"], "same-origin-plus-coep");
     assert_equals(report_2[0].body["property"], property);
     assert_equals(report_2[0].body["source-file"], undefined);
     assert_equals(report_2[0].body["lineno"], undefined);
     assert_equals(report_2[0].body["colno"], undefined);
-  }, `${op})`);
+  }, `${op}`);
 });
 
 </script>

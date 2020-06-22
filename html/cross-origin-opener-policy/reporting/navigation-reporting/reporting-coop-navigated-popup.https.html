@@ -2,7 +2,7 @@
 <script src=/resources/testharness.js></script>
 <script src=/resources/testharnessreport.js></script>
 <script src="/common/utils.js"></script> <!-- Use token() to allow running tests in parallel -->
-<script src="resources/reporting-common.js"></script>
+<script src="../resources/reporting-common.js"></script>
 
 <script>
 
@@ -18,8 +18,8 @@ promise_test( async t => {
   const noCoopChannelName = token();
   const coopChannelName = token();
   await reportingTest( (resolve) => {
-    const noCOOP = `resources/coop-coep.py?coop=${encodeURIComponent(`unsafe-none; report-to="${popupReportEndpoint.name}"`)}&coep=&channel=${noCoopChannelName}`;
-    const coop = `resources/coop-coep.py?coop=${encodeURIComponent(`same-origin; report-to="${redirectReportEndpoint.name}"`)}&coep=&channel=${coopChannelName}`;
+    const noCOOP = `../../resources/coop-coep.py?coop=${encodeURIComponent(`unsafe-none; report-to="${popupReportEndpoint.name}"`)}&coep=&channel=${noCoopChannelName}`;
+    const coop = `../../resources/coop-coep.py?coop=${encodeURIComponent(`same-origin; report-to="${redirectReportEndpoint.name}"`)}&coep=&channel=${coopChannelName}`;
 
     const popup = window.open(noCOOP, popupName);
     const channel = new BroadcastChannel(coopChannelName);
