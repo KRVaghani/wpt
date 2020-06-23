@@ -508,7 +508,6 @@ function test16() {
         document.body.style.zoom = 0.1;
       },
       notify: (entries, observer) => {
-        // Ensure zoom does not impact the sizes
         assert_equals(entries.length, 1);
         assert_equals(entries[0].contentRect.width, 50);
         assert_equals(entries[0].contentRect.height, 20);
@@ -516,8 +515,8 @@ function test16() {
         assert_equals(entries[0].contentBoxSize[0].blockSize, 20);
         assert_equals(entries[0].borderBoxSize[0].inlineSize, 50);
         assert_equals(entries[0].borderBoxSize[0].blockSize, 20);
-        assert_equals(entries[0].devicePixelContentBoxSize[0].inlineSize, 50);
-        assert_equals(entries[0].devicePixelContentBoxSize[0].blockSize, 20);
+        assert_equals(entries[0].devicePixelContentBoxSize[0].inlineSize, 5);
+        assert_equals(entries[0].devicePixelContentBoxSize[0].blockSize, 2);
         return true;  // Delay next step
       }
     },
@@ -526,11 +525,16 @@ function test16() {
         document.body.style.zoom = 10;
       },
       notify: (entries, observer) => {
-
+        assert_equals(entries.length, 1);
+        assert_equals(entries[0].contentRect.width, 50);
+        assert_equals(entries[0].contentRect.height, 20);
+        assert_equals(entries[0].contentBoxSize[0].inlineSize, 50);
+        assert_equals(entries[0].contentBoxSize[0].blockSize, 20);
+        assert_equals(entries[0].borderBoxSize[0].inlineSize, 50);
+        assert_equals(entries[0].borderBoxSize[0].blockSize, 20);
+        assert_equals(entries[0].devicePixelContentBoxSize[0].inlineSize, 500);
+        assert_equals(entries[0].devicePixelContentBoxSize[0].blockSize, 200);
       },
-      timeout: () => {
-        // SVG computed size is always bounding box inline and block lengths
-      }
     }
   ]);
   return helper.start();
